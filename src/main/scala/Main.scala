@@ -14,7 +14,10 @@ object Main {
 
 
   def main(args: Array[String]): Unit = {
-    val limits: List[Double] = List(1e3, 1e4, 1e5, 1e6)
+    val limits: List[Double] = List(1e3, 2e3, 5e3,
+                                    1e4, 2e4, 5e4,
+                                    1e5, 2e5, 5e5,
+                                    1e6)
     println("Measure with 2 operations")
     limits.map(_.toInt).foreach(measureFns(combinator2op(_), loop2op(_)))
     println("Measure with 3 operations")
@@ -67,7 +70,9 @@ object Main {
 
     println(s"combinators time: $combinatorTime ms with $upperLimit upper limit")
     println(s"      array time: $loopTime ms with $upperLimit upper limit")
-    println(s"diff: ${combinatorTime.value - loopTime.value}")
+    val difference = combinatorTime.value - loopTime.value
+    val timesFaster = combinatorTime.value / loopTime.value
+    println(s"difference: $difference ms, loop is $timesFaster times faster")
     println()
   }
 
