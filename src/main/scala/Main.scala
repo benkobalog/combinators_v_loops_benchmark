@@ -19,13 +19,20 @@ object Main {
                                     1e5, 2e5, 5e5,
                                     1e6)
     println("Measure with 2 operations")
-    limits.map(_.toInt).foreach(measureFns(combinator2op(_), loop2op(_)))
+    limits.map(_.toInt).foreach(measureFns(mapFilter2op(_), collect2op(_), loop2op(_)))
     println("Measure with 3 operations")
-    limits.map(_.toInt).foreach(measureFns(combinator3op(_), loop3op(_)))
+    limits.map(_.toInt).foreach(measureFns(mapFilter3op(_), collect3op(_), loop3op(_)))
   }
 
-  def combinator2op(list: List[Int]) = {
+  def mapFilter2op(list: List[Int]) = {
     list.filter(_ % 2 == 0).map(_ + 10)
+  }
+
+  def collect2op(list: List[Int]) = {
+    list.collect{
+      case x if x % 2 == 0 =>
+        x + 10
+    }
   }
 
   def loop2op(list: List[Int]) = {
@@ -38,8 +45,16 @@ object Main {
     }
   }
 
-  def combinator3op(list: List[Int]) = {
+  def mapFilter3op(list: List[Int]) = {
     list.filter(_ % 2 == 0).map(_ + 10).map(x => x*x)
+  }
+
+  def collect3op(list: List[Int]) = {
+    list.collect{
+      case x if x % 2 == 0 =>
+        val y = x + 10
+        y * y
+    }
   }
 
   def loop3op(list: List[Int]) = {
@@ -55,24 +70,35 @@ object Main {
   }
 
   def measureFns(
-                  combOp: List[Int] => Unit,
+                  mapFilterOp: List[Int] => Unit,
+                  collectOp: List[Int] => Unit,
                   loopOp: List[Int] => Unit
                 )(upperLimit: Int): Unit = {
     val list = (0 to upperLimit).toList
 
-    val combinatorTime = standardConfig.measure {
-      combOp(list)
+    val mapFilterTime = standardConfig.measure {
+      mapFilterOp(list)
+    }
+
+    val collectTime = standardConfig.measure {
+      collectOp(list)
     }
 
     val loopTime = standardConfig.measure {
       loopOp(list)
     }
 
-    println(s"combinators time: $combinatorTime ms with $upperLimit upper limit")
-    println(s"      array time: $loopTime ms with $upperLimit upper limit")
-    val difference = combinatorTime.value - loopTime.value
-    val timesFaster = combinatorTime.value / loopTime.value
-    println(s"difference: $difference ms, loop is $timesFaster times faster")
+    println(s"map filter time: $mapFilterTime with $upperLimit upper limit")
+    println(s"   collect time: $collectTime with $upperLimit upper limit")
+    println(s"      loop time: $loopTime with $upperLimit upper limit")
+    val mfPerLoop = mapFilterTime.value - loopTime.value
+    val mfPerLooptimes = mapFilterTime.value / loopTime.value
+    val mfPerCollectTimes = mapFilterTime.value / collectTime.value
+    val collectPerLoop = collectTime.value / loopTime.value
+    println(s"map filter /    loop: $mfPerLooptimes")
+    println(s"map filter / collect: $mfPerCollectTimes")
+    println(s"collect    /    loop: $collectPerLoop")
+    println(s"loop       / collect: ${1.0 / collectPerLoop}")
     println()
   }
 
