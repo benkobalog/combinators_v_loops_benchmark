@@ -11,8 +11,6 @@ object Main {
     Key.verbose -> false
   ) withWarmer(new Warmer.Default)
 
-
-
   def main(args: Array[String]): Unit = {
     val limits: List[Double] = List(1e3, 2e3, 5e3,
                                     1e4, 2e4, 5e4,
@@ -88,9 +86,9 @@ object Main {
       loopOp(list)
     }
 
-    println(s"map filter time: $mapFilterTime with $upperLimit upper limit")
-    println(s"   collect time: $collectTime with $upperLimit upper limit")
-    println(s"      loop time: $loopTime with $upperLimit upper limit")
+    println(s"map filter time: $mapFilterTime on $upperLimit elements")
+    println(s"   collect time: $collectTime on $upperLimit elements")
+    println(s"      loop time: $loopTime on $upperLimit elements")
     val mfPerLoop = mapFilterTime.value - loopTime.value
     val mfPerLooptimes = mapFilterTime.value / loopTime.value
     val mfPerCollectTimes = mapFilterTime.value / collectTime.value
@@ -101,5 +99,4 @@ object Main {
     println(s"loop       / collect: ${1.0 / collectPerLoop}")
     println()
   }
-
 }
