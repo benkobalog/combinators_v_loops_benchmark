@@ -16,9 +16,9 @@ object Main {
                                     1e4, 2e4, 5e4,
                                     1e5, 2e5, 5e5,
                                     1e6)
-    println("Measure with 2 operations")
+    println("======= Measure with 2 operations =======")
     limits.map(_.toInt).foreach(measureFns(mapFilter2op(_), collect2op(_), loop2op(_)))
-    println("Measure with 3 operations")
+    println("======= Measure with 3 operations =======")
     limits.map(_.toInt).foreach(measureFns(mapFilter3op(_), collect3op(_), loop3op(_)))
   }
 
@@ -36,10 +36,13 @@ object Main {
   def loop2op(list: List[Int]) = {
 
     val array = ArrayBuffer[Int]()
-    list.foreach { x =>
+    val len = list.length
+    var x = 0
+    while(x < len) {
       if(x % 2 == 0) {
         array.append(x + 10)
       }
+      x += 1
     }
   }
 
@@ -58,12 +61,15 @@ object Main {
   def loop3op(list: List[Int]) = {
 
     val array = ArrayBuffer[Int]()
-    list.foreach { x =>
+    val len = list.length
+    var x = 0
+    while(x < len) {
       if(x % 2 == 0) {
         val y = x + 10
         val z = y * y
         array.append(z)
       }
+      x += 1
     }
   }
 
