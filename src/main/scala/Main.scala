@@ -12,71 +12,27 @@ object Main {
   ).withWarmer(new Warmer.Default)
 
   def main(args: Array[String]): Unit = {
+
+    val mapFilter = new MapFilterImpl
+    val collect = new CollectImpl
+    val arrayBuffer = new ArrayImpl
+
+
     val limits: List[Double] = List(1e3, 2e3, 5e3,
                                     1e4, 2e4, 5e4,
                                     1e5, 2e5, 5e5,
                                     1e6)
     println("======= Measure with 2 operations =======")
-    limits.map(_.toInt).foreach(measureFns(mapFilter2op, collect2op, loop2op))
+    limits.map(_.toInt).foreach(measureFns(mapFilter.o2, collect.o2, arrayBuffer.o2))
     println("======= Measure with 3 operations =======")
-    limits.map(_.toInt).foreach(measureFns(mapFilter3op, collect3op, loop3op))
+    limits.map(_.toInt).foreach(measureFns(mapFilter.o3, collect.o3, arrayBuffer.o3))
   }
 
-  def mapFilter2op(list: List[Int]) = {
-    list.filter(_ % 2 == 0).map(_ + 10)
-  }
-
-  def collect2op(list: List[Int]) = {
-    list.collect{
-      case x if x % 2 == 0 =>
-        x + 10
-    }
-  }
-
-  def loop2op(list: List[Int]) = {
-
-    val array = ArrayBuffer[Int]()
-    val len = list.length
-    var x = 0
-    while(x < len) {
-      if(x % 2 == 0) {
-        array.append(x + 10)
-      }
-      x += 1
-    }
-  }
-
-  def mapFilter3op(list: List[Int]) = {
-    list.filter(_ % 2 == 0).map(_ + 10).map(x => x*x)
-  }
-
-  def collect3op(list: List[Int]) = {
-    list.collect{
-      case x if x % 2 == 0 =>
-        val y = x + 10
-        y * y
-    }
-  }
-
-  def loop3op(list: List[Int]) = {
-
-    val array = ArrayBuffer[Int]()
-    val len = list.length
-    var x = 0
-    while(x < len) {
-      if(x % 2 == 0) {
-        val y = x + 10
-        val z = y * y
-        array.append(z)
-      }
-      x += 1
-    }
-  }
 
   def measureFns(
                   mapFilterOp: List[Int] => List[_],
                   collectOp: List[Int] => List[_],
-                  loopOp: List[Int] => Unit
+                  loopOp: List[Int] => ArrayBuffer[Int]
                 )(upperLimit: Int): Unit = {
     val list = (0 to upperLimit).toList
 

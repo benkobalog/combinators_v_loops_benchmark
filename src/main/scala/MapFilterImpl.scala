@@ -1,6 +1,8 @@
 
-class MapFilter[A] extends RunOps[A]{
-  override def o2(list: List[A]): Traversable[A] = ???
+class MapFilterImpl extends RunOps[Int]{
+  override def o2(list: List[Int]): List[Int] =
+    list.filter(_ % 2 == 0).map(_ + 10)
 
-  override def o3(list: List[A]): Traversable[A] = ???
+  override def o3(list: List[Int]): List[Int] =
+    list.filter(_ % 2 == 0).map(_ + 10).map(x => x*x)
 }
