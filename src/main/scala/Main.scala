@@ -23,9 +23,26 @@ object Main {
                                     1e5, 2e5, 5e5,
                                     1e6)
     println("======= Measure with 2 operations =======")
-    limits.map(_.toInt).foreach(measureFns(mapFilter.o2, collect.o2, arrayBuffer.o2))
+    val twoOps =
+      limits
+        .map(_.toInt)
+        .map(measureFns(mapFilter.o2, collect.o2, arrayBuffer.o2))
+
+    println("L vs M  | C vs M  | C vs L  | limit")
+    twoOps.foreach{ case (ml, mc, cl, limit)
+      => println(f"$ml%1.5f | $mc%1.5f | $cl%1.5f | $limit") }
+
     println("======= Measure with 3 operations =======")
-    limits.map(_.toInt).foreach(measureFns(mapFilter.o3, collect.o3, arrayBuffer.o3))
+    val threeOps =
+      limits
+        .map(_.toInt)
+        .map(measureFns(mapFilter.o3, collect.o3, arrayBuffer.o3))
+
+    println("L vs M  | C vs M  | C vs L  | limit")
+    threeOps.foreach{ case (ml, mc, cl, limit)
+      => println(f"$ml%1.5f | $mc%1.5f | $cl%1.5f | $limit") }
+
+    println("M -> Map Filter | C -> Collect | L -> Loop")
   }
 
 
@@ -33,7 +50,7 @@ object Main {
                   mapFilterOp: List[Int] => List[_],
                   collectOp: List[Int] => List[_],
                   loopOp: List[Int] => ArrayBuffer[Int]
-                )(upperLimit: Int): Unit = {
+                )(upperLimit: Int) = {
     val list = (0 to upperLimit).toList
 
     val mapFilterTime = standardConfig.measure {
@@ -48,17 +65,10 @@ object Main {
       loopOp(list)
     }
 
-    println(s"map filter time: $mapFilterTime on $upperLimit elements")
-    println(s"   collect time: $collectTime on $upperLimit elements")
-    println(s"      loop time: $loopTime on $upperLimit elements")
-    val mfPerLoop = mapFilterTime.value - loopTime.value
     val mfPerLoopTimes = mapFilterTime.value / loopTime.value
     val mfPerCollectTimes = mapFilterTime.value / collectTime.value
-    val collectPerLoop = collectTime.value / loopTime.value
-    println(s"map filter /    loop: $mfPerLoopTimes")
-    println(s"map filter / collect: $mfPerCollectTimes")
-    println(s"collect    /    loop: $collectPerLoop")
-    println(s"loop       / collect: ${1.0 / collectPerLoop}")
-    println()
+    val collectPerLoop = loopTime.value / collectTime.value
+
+    (mfPerLoopTimes , mfPerCollectTimes, collectPerLoop, upperLimit)
   }
 }
